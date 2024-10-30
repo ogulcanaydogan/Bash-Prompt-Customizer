@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bash Prompt Customizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-section {
+            margin: 20px 0;
+        }
+
+        .color-display {
+            margin: 10px 0;
+            padding: 20px;
+            border-radius: 5px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .bash-command {
+            width: 100%;
+            height: 100px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        #previewContainer {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            padding: 20px;
+            margin-top: 10px;
+            width: 600px;
+        }
+
+        .color-preview {
+            display: inline-block;
+            font-family: monospace;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Bash Prompt Customizer</h2>
+
+    <!-- Color Pickers with Checkboxes -->
+    <div class="color-section">
+        <label><input type="checkbox" id="bracketColorCheck"> Bracket Color</label>
+        <input type="color" id="bracketColorPicker" value="#ffffff">
+        <span id="bracketColorDisplay" class="color-display">Select Bracket Color</span>
+    </div>
+    <div class="color-section">
+        <label><input type="checkbox" id="timestampColorCheck"> Timestamp Color</label>
+        <input type="color" id="timestampColorPicker" value="#ffffff">
+        <span id="timestampColorDisplay" class="color-display">Select Timestamp Color</span>
+    </div>
+    <div class="color-section">
+        <label><input type="checkbox" id="directoryColorCheck"> Directory Color</label>
+        <input type="color" id="directoryColorPicker" value="#ffffff">
+        <span id="directoryColorDisplay" class="color-display">Select Directory Color</span>
+    </div>
+    <div class="color-section">
+        <label><input type="checkbox" id="usernameColorCheck"> Username Color</label>
+        <input type="color" id="usernameColorPicker" value="#ffffff">
+        <span id="usernameColorDisplay" class="color-display">Select Username Color</span>
+    </div>
+    <div class="color-section">
+        <label><input type="checkbox" id="hostnameColorCheck"> Hostname Color</label>
+        <input type="color" id="hostnameColorPicker" value="#ffffff">
+        <span id="hostnameColorDisplay" class="color-display">Select Hostname Color</span>
+    </div>
+    <div class="color-section">
+        <label><input type="checkbox" id="promptSymbolColorCheck"> Prompt Symbol Color</label>
+        <input type="color" id="promptSymbolColorPicker" value="#ffffff">
+        <span id="promptSymbolColorDisplay" class="color-display">Select Prompt Symbol Color</span>
+    </div>
+
+    <!-- Live preview -->
+    <div id="previewContainer">
+        <pre id="previewPrompt">
+            <span id="bracketColorPreview">[</span><span id="timestampColorPreview">16:00:32</span><span id="bracketColorPreviewEnd">]</span>
+            <span id="directoryColorPreview"> ~</span>
+            <br>
+            <span id="usernameColorPreview">user</span><span id="atSymbol">@</span><span id="hostnameColorPreview">host</span>
+            <span id="promptSymbolPreview"> $</span>
+        </pre>
+    </div>
+
+    <!-- Bash Command with Copy Button -->
+    <textarea id="bashCommand" class="bash-command" readonly></textarea>
+    <button id="copyButton">Copy Command</button>
+</div>
+
+<script>
+// Utility to convert hex to RGB
+function hexToRgb(hex) {
+    const bigint = parseInt(hex.slice(1), 16);
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+}
+
+// Update Bash command and live preview
+function updateBashCommand() {
+    const components = {
+        bracketColor: bracketColorCheck.checked ? hexToRgb(bracketColorPicker.value) : null,
+        timestampColor: timestampColorCheck.checked ? hexToRgb(timestampColorPicker.value) : null,
+        directoryColor: directoryColorCheck.checked ? hexToRgb(directoryColorPicker.value) : null,
+        usernameColor: usernameColorCheck.checked ? hexToRgb(usernameColorPicker.value) : null,
+        hostnameColor: hostnameColorCheck.checked ? hexToRgb(hostnameColorPicker.value) : null,
+        promptSymbolColor: promptSymbolColorCheck.checked ? hexToRgb(promptSymbolColorPicker.value) : null,
+    };
+
+    let command = 'export PS1="';
+    if (components.bracketColor) command += `\\[\\e[38;2;${components.bracketColor.join(';')}m\\][`;
+    if (components.timestampColor) command += `\\[\\e[38;2;${components.timestampColor.join(';')}m\\]\\t`;
+    if (components.bracketColor) command += `\\[\\e[38;2;${components.bracketColor.join(';')}m\\]]`;
+    command += '\\r\\n';
+    if (components.usernameColor) command += `\\[\\e[38;2;${components.usernameColor.join(';')}m\\]\\u`;
+    command += '@';
+    if (components.hostnameColor) command += `\\[\\e[38;2;${components.hostnameColor.join(';')}m\\]\\h`;
+    if (components.promptSymbolColor) command += `\\[\\e[38;2;${components.promptSymbolColor.join(';')}m\\] $`;
+    command += '\\[$(tput sgr0)\\]"';
+
+    bashCommand.value = command;
+
+    // Update live preview colors
+    if (components.bracketColor) {
+        bracketColorPreview.style.color = `rgb(${components.bracketColor.join(',')})`;
+        bracketColorPreviewEnd.style.color = `rgb(${components.bracketColor.join(',')})`;
+    }
+    if (components.timestampColor) timestampColorPreview.style.color = `rgb(${components.timestampColor.join(',')})`;
+    if (components.directoryColor) directoryColorPreview.style.color = `rgb(${components.directoryColor.join(',')})`;
+    if (components.usernameColor) usernameColorPreview.style.color = `rgb(${components.usernameColor.join(',')})`;
+    if (components.hostnameColor) hostnameColorPreview.style.color = `rgb(${components.hostnameColor.join(',')})`;
+    if (components.promptSymbolColor) promptSymbolPreview.style.color = `rgb(${components.promptSymbolColor.join(',')})`;
+}
+
+// Copy to clipboard function
+function copyToClipboard() {
+    bashCommand.select();
+    document.execCommand('copy');
+    alert('Bash command copied to clipboard!');
+}
+
+// Event listeners
+document.getElementById('copyButton').addEventListener('click', copyToClipboard);
+document.querySelectorAll('input[type=color], input[type=checkbox]').forEach(input => {
+    input.addEventListener('input', updateBashCommand);
+});
+
+// Initialize
+updateBashCommand();
+</script>
+
+</body>
+</html>
+
+
