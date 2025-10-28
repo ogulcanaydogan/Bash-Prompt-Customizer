@@ -4,173 +4,166 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bash Prompt Customizer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 50px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .color-section {
-            margin: 20px 0;
-        }
-
-        .color-display {
-            margin: 10px 0;
-            padding: 20px;
-            border-radius: 5px;
-            font-size: 20px;
-            color: white;
-        }
-
-        .bash-command {
-            width: 100%;
-            height: 100px;
-            margin-top: 20px;
-            font-size: 16px;
-        }
-
-        #previewContainer {
-            background-color: #1e1e1e;
-            color: #ffffff;
-            padding: 20px;
-            margin-top: 10px;
-            width: 600px;
-        }
-
-        .color-preview {
-            display: inline-block;
-            font-family: monospace;
-            font-size: 1.2em;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <header class="app-header">
+        <div class="app-header__content">
+            <h1>Bash Prompt Customizer</h1>
+            <p>Design a two-line <code>PS1</code> prompt with vivid colors, live preview, and a ready-to-copy export command.</p>
+        </div>
+    </header>
 
-<div class="container">
-    <h2>Bash Prompt Customizer</h2>
+    <main class="app-shell">
+        <section class="builder-panel" aria-labelledby="controlsTitle">
+            <div class="panel-heading">
+                <div>
+                    <h2 id="controlsTitle">Prompt segments</h2>
+                    <p class="panel-description">Toggle the pieces you want to colorize, then pick a tone that matches your style.</p>
+                </div>
+                <button id="resetButton" class="ghost-button" type="button">Reset to defaults</button>
+            </div>
 
-    <!-- Color Pickers with Checkboxes -->
-    <div class="color-section">
-        <label><input type="checkbox" id="bracketColorCheck"> Bracket Color</label>
-        <input type="color" id="bracketColorPicker" value="#ffffff">
-        <span id="bracketColorDisplay" class="color-display">Select Bracket Color</span>
-    </div>
-    <div class="color-section">
-        <label><input type="checkbox" id="timestampColorCheck"> Timestamp Color</label>
-        <input type="color" id="timestampColorPicker" value="#ffffff">
-        <span id="timestampColorDisplay" class="color-display">Select Timestamp Color</span>
-    </div>
-    <div class="color-section">
-        <label><input type="checkbox" id="directoryColorCheck"> Directory Color</label>
-        <input type="color" id="directoryColorPicker" value="#ffffff">
-        <span id="directoryColorDisplay" class="color-display">Select Directory Color</span>
-    </div>
-    <div class="color-section">
-        <label><input type="checkbox" id="usernameColorCheck"> Username Color</label>
-        <input type="color" id="usernameColorPicker" value="#ffffff">
-        <span id="usernameColorDisplay" class="color-display">Select Username Color</span>
-    </div>
-    <div class="color-section">
-        <label><input type="checkbox" id="hostnameColorCheck"> Hostname Color</label>
-        <input type="color" id="hostnameColorPicker" value="#ffffff">
-        <span id="hostnameColorDisplay" class="color-display">Select Hostname Color</span>
-    </div>
-    <div class="color-section">
-        <label><input type="checkbox" id="promptSymbolColorCheck"> Prompt Symbol Color</label>
-        <input type="color" id="promptSymbolColorPicker" value="#ffffff">
-        <span id="promptSymbolColorDisplay" class="color-display">Select Prompt Symbol Color</span>
-    </div>
+            <div class="control-grid">
+                <article class="control-card" data-control="bracket">
+                    <header class="control-card__header">
+                        <div>
+                            <h3>Brackets</h3>
+                            <p>Colors the <code>[</code> and <code>]</code> around the timestamp.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="bracketColorCheck" data-control-key="bracket" checked>
+                            <span class="switch__track" aria-hidden="true"></span>
+                            <span class="visually-hidden">Enable bracket color</span>
+                        </label>
+                    </header>
+                    <div class="control-card__body">
+                        <input type="color" id="bracketColorPicker" value="#38bdf8" aria-describedby="bracketColorValue">
+                        <span id="bracketColorValue" class="color-value">#38BDF8</span>
+                    </div>
+                </article>
 
-    <!-- Live preview -->
-    <div id="previewContainer">
-        <pre id="previewPrompt">
-            <span id="bracketColorPreview">[</span><span id="timestampColorPreview">16:00:32</span><span id="bracketColorPreviewEnd">]</span>
-            <span id="directoryColorPreview"> ~</span>
-            <br>
-            <span id="usernameColorPreview">user</span><span id="atSymbol">@</span><span id="hostnameColorPreview">host</span>
-            <span id="promptSymbolPreview"> $</span>
-        </pre>
-    </div>
+                <article class="control-card" data-control="timestamp">
+                    <header class="control-card__header">
+                        <div>
+                            <h3>Timestamp</h3>
+                            <p>Styles the <code>\t</code> time component on the first line.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="timestampColorCheck" data-control-key="timestamp" checked>
+                            <span class="switch__track" aria-hidden="true"></span>
+                            <span class="visually-hidden">Enable timestamp color</span>
+                        </label>
+                    </header>
+                    <div class="control-card__body">
+                        <input type="color" id="timestampColorPicker" value="#fde047" aria-describedby="timestampColorValue">
+                        <span id="timestampColorValue" class="color-value">#FDE047</span>
+                    </div>
+                </article>
 
-    <!-- Bash Command with Copy Button -->
-    <textarea id="bashCommand" class="bash-command" readonly></textarea>
-    <button id="copyButton">Copy Command</button>
-</div>
+                <article class="control-card" data-control="directory">
+                    <header class="control-card__header">
+                        <div>
+                            <h3>Working directory</h3>
+                            <p>Highlights the <code>\w</code> path displayed after the timestamp.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="directoryColorCheck" data-control-key="directory" checked>
+                            <span class="switch__track" aria-hidden="true"></span>
+                            <span class="visually-hidden">Enable directory color</span>
+                        </label>
+                    </header>
+                    <div class="control-card__body">
+                        <input type="color" id="directoryColorPicker" value="#a855f7" aria-describedby="directoryColorValue">
+                        <span id="directoryColorValue" class="color-value">#A855F7</span>
+                    </div>
+                </article>
 
-<script>
-// Utility to convert hex to RGB
-function hexToRgb(hex) {
-    const bigint = parseInt(hex.slice(1), 16);
-    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
-}
+                <article class="control-card" data-control="username">
+                    <header class="control-card__header">
+                        <div>
+                            <h3>Username</h3>
+                            <p>Applies color to the <code>\u</code> username on the second line.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="usernameColorCheck" data-control-key="username" checked>
+                            <span class="switch__track" aria-hidden="true"></span>
+                            <span class="visually-hidden">Enable username color</span>
+                        </label>
+                    </header>
+                    <div class="control-card__body">
+                        <input type="color" id="usernameColorPicker" value="#22d3ee" aria-describedby="usernameColorValue">
+                        <span id="usernameColorValue" class="color-value">#22D3EE</span>
+                    </div>
+                </article>
 
-// Update Bash command and live preview
-function updateBashCommand() {
-    const components = {
-        bracketColor: bracketColorCheck.checked ? hexToRgb(bracketColorPicker.value) : null,
-        timestampColor: timestampColorCheck.checked ? hexToRgb(timestampColorPicker.value) : null,
-        directoryColor: directoryColorCheck.checked ? hexToRgb(directoryColorPicker.value) : null,
-        usernameColor: usernameColorCheck.checked ? hexToRgb(usernameColorPicker.value) : null,
-        hostnameColor: hostnameColorCheck.checked ? hexToRgb(hostnameColorPicker.value) : null,
-        promptSymbolColor: promptSymbolColorCheck.checked ? hexToRgb(promptSymbolColorPicker.value) : null,
-    };
+                <article class="control-card" data-control="hostname">
+                    <header class="control-card__header">
+                        <div>
+                            <h3>Hostname</h3>
+                            <p>Colors the <code>\h</code> host that follows the <code>@</code> symbol.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="hostnameColorCheck" data-control-key="hostname" checked>
+                            <span class="switch__track" aria-hidden="true"></span>
+                            <span class="visually-hidden">Enable hostname color</span>
+                        </label>
+                    </header>
+                    <div class="control-card__body">
+                        <input type="color" id="hostnameColorPicker" value="#f97316" aria-describedby="hostnameColorValue">
+                        <span id="hostnameColorValue" class="color-value">#F97316</span>
+                    </div>
+                </article>
 
-    let command = 'export PS1="';
-    if (components.bracketColor) command += `\\[\\e[38;2;${components.bracketColor.join(';')}m\\][`;
-    if (components.timestampColor) command += `\\[\\e[38;2;${components.timestampColor.join(';')}m\\]\\t`;
-    if (components.bracketColor) command += `\\[\\e[38;2;${components.bracketColor.join(';')}m\\]]`;
-    command += '\\r\\n';
-    if (components.usernameColor) command += `\\[\\e[38;2;${components.usernameColor.join(';')}m\\]\\u`;
-    command += '@';
-    if (components.hostnameColor) command += `\\[\\e[38;2;${components.hostnameColor.join(';')}m\\]\\h`;
-    if (components.promptSymbolColor) command += `\\[\\e[38;2;${components.promptSymbolColor.join(';')}m\\] $`;
-    command += '\\[$(tput sgr0)\\]"';
+                <article class="control-card" data-control="promptSymbol">
+                    <header class="control-card__header">
+                        <div>
+                            <h3>Prompt symbol</h3>
+                            <p>Styles the trailing <code>$</code> to match your shell vibe.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="promptSymbolColorCheck" data-control-key="promptSymbol" checked>
+                            <span class="switch__track" aria-hidden="true"></span>
+                            <span class="visually-hidden">Enable prompt symbol color</span>
+                        </label>
+                    </header>
+                    <div class="control-card__body">
+                        <input type="color" id="promptSymbolColorPicker" value="#f43f5e" aria-describedby="promptSymbolColorValue">
+                        <span id="promptSymbolColorValue" class="color-value">#F43F5E</span>
+                    </div>
+                </article>
+            </div>
+        </section>
 
-    bashCommand.value = command;
+        <section class="preview-panel" aria-labelledby="previewTitle">
+            <h2 id="previewTitle">Live preview</h2>
+            <p class="panel-description">See how your prompt renders in a terminal-inspired preview.</p>
 
-    // Update live preview colors
-    if (components.bracketColor) {
-        bracketColorPreview.style.color = `rgb(${components.bracketColor.join(',')})`;
-        bracketColorPreviewEnd.style.color = `rgb(${components.bracketColor.join(',')})`;
-    }
-    if (components.timestampColor) timestampColorPreview.style.color = `rgb(${components.timestampColor.join(',')})`;
-    if (components.directoryColor) directoryColorPreview.style.color = `rgb(${components.directoryColor.join(',')})`;
-    if (components.usernameColor) usernameColorPreview.style.color = `rgb(${components.usernameColor.join(',')})`;
-    if (components.hostnameColor) hostnameColorPreview.style.color = `rgb(${components.hostnameColor.join(',')})`;
-    if (components.promptSymbolColor) promptSymbolPreview.style.color = `rgb(${components.promptSymbolColor.join(',')})`;
-}
+            <div id="previewContainer" class="preview-terminal" aria-live="polite">
+                <pre id="previewPrompt">
+<span id="bracketColorPreview" data-default-color="#6b7280" style="color:#6b7280;">[</span><span id="timestampColorPreview" data-default-color="#facc15" style="color:#facc15;">16:42:03</span><span id="bracketColorPreviewEnd" data-default-color="#6b7280" style="color:#6b7280;">]</span><span class="preview-space"> </span><span id="directoryColorPreview" data-default-color="#a5b4fc" style="color:#a5b4fc;">~/workspace/bash-customizer</span>
+<span id="usernameColorPreview" data-default-color="#22d3ee" style="color:#22d3ee;">user</span><span id="atSymbol" data-default-color="#94a3b8" style="color:#94a3b8;">@</span><span id="hostnameColorPreview" data-default-color="#f97316" style="color:#f97316;">host</span><span class="preview-space"> </span><span id="promptSymbolPreview" data-default-color="#f43f5e" style="color:#f43f5e;">$</span><span class="preview-cursor" aria-hidden="true">▊</span>
+                </pre>
+            </div>
 
-// Copy to clipboard function
-function copyToClipboard() {
-    bashCommand.select();
-    document.execCommand('copy');
-    alert('Bash command copied to clipboard!');
-}
+            <div class="command-panel">
+                <div class="command-panel__header">
+                    <h3>Export command</h3>
+                    <p>Add this to your <code>.bashrc</code> or run it in your terminal.</p>
+                </div>
+                <textarea id="bashCommand" class="bash-command" rows="4" readonly spellcheck="false"></textarea>
+                <div class="action-row">
+                    <button id="copyButton" class="primary-button" type="button">Copy command</button>
+                    <span id="copyHint" class="copy-hint" role="status" aria-live="polite"></span>
+                </div>
+            </div>
+        </section>
+    </main>
 
-// Event listeners
-document.getElementById('copyButton').addEventListener('click', copyToClipboard);
-document.querySelectorAll('input[type=color], input[type=checkbox]').forEach(input => {
-    input.addEventListener('input', updateBashCommand);
-});
+    <footer class="app-footer">
+        <p>Created by <a href="https://www.ogulcanaydogan.com" target="_blank" rel="noopener">Oğulcan Aydoğan</a></p>
+    </footer>
 
-// Initialize
-updateBashCommand();
-</script>
-
+    <script src="script.js" defer></script>
 </body>
-<footer style="text-align: center; margin-top: 20px;">
-    <p>Created by <a href="https://www.ogulcanaydogan.com" target="_blank">Oğulcan Aydoğan</a></p>
-</footer>
-
 </html>
-
-

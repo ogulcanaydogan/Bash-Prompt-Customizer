@@ -1,81 +1,183 @@
-// Additi// Get elements for each part of the preview
-const previewPrompt = document.getElementById('previewPrompt');
-const timestampColorPreview = document.getElementById('timestampColorPreview');
-const directoryColorPreview = document.getElementById('directoryColorPreview');
-const usernameColorPreview = document.getElementById('usernameColorPreview');
-const hostnameColorPreview = document.getElementById('hostnameColorPreview');
-const promptSymbolPreview = document.getElementById('promptSymbolPreview');
-const bracketColorPreview = document.getElementById('bracketColorPreview');
-const bracketColorPreviewEnd = document.getElementById('bracketColorPreviewEnd');
+const bashCommand = document.getElementById('bashCommand');
+const copyButton = document.getElementById('copyButton');
+const copyHint = document.getElementById('copyHint');
+const resetButton = document.getElementById('resetButton');
 
-// Update Bash command and live preview
-function updateBashCommand() {
-    const components = {
-        bgColor: bgColorCheck.checked ? hexToRgb(bgColorPicker.value) : null,
-        textColor: textColorCheck.checked ? hexToRgb(textColorPicker.value) : null,
-        cursorColor: cursorColorCheck.checked ? hexToRgb(cursorColorPicker.value) : null,
-        bracketColor: bracketColorCheck.checked ? hexToRgb(bracketColorPicker.value) : null,
-        timestampColor: timestampColorCheck.checked ? hexToRgb(timestampColorPicker.value) : null,
-        directoryColor: directoryColorCheck.checked ? hexToRgb(directoryColorPicker.value) : null,
-        usernameColor: usernameColorCheck.checked ? hexToRgb(usernameColorPicker.value) : null,
-        hostnameColor: hostnameColorCheck.checked ? hexToRgb(hostnameColorPicker.value) : null,
-        promptSymbolColor: promptSymbolColorCheck.checked ? hexToRgb(promptSymbolColorPicker.value) : null,
-    };
+const controls = [
+    {
+        key: 'bracket',
+        check: document.getElementById('bracketColorCheck'),
+        picker: document.getElementById('bracketColorPicker'),
+        value: document.getElementById('bracketColorValue'),
+        card: document.querySelector('[data-control="bracket"]'),
+        preview: [
+            document.getElementById('bracketColorPreview'),
+            document.getElementById('bracketColorPreviewEnd')
+        ]
+    },
+    {
+        key: 'timestamp',
+        check: document.getElementById('timestampColorCheck'),
+        picker: document.getElementById('timestampColorPicker'),
+        value: document.getElementById('timestampColorValue'),
+        card: document.querySelector('[data-control="timestamp"]'),
+        preview: [document.getElementById('timestampColorPreview')]
+    },
+    {
+        key: 'directory',
+        check: document.getElementById('directoryColorCheck'),
+        picker: document.getElementById('directoryColorPicker'),
+        value: document.getElementById('directoryColorValue'),
+        card: document.querySelector('[data-control="directory"]'),
+        preview: [document.getElementById('directoryColorPreview')]
+    },
+    {
+        key: 'username',
+        check: document.getElementById('usernameColorCheck'),
+        picker: document.getElementById('usernameColorPicker'),
+        value: document.getElementById('usernameColorValue'),
+        card: document.querySelector('[data-control="username"]'),
+        preview: [document.getElementById('usernameColorPreview')]
+    },
+    {
+        key: 'hostname',
+        check: document.getElementById('hostnameColorCheck'),
+        picker: document.getElementById('hostnameColorPicker'),
+        value: document.getElementById('hostnameColorValue'),
+        card: document.querySelector('[data-control="hostname"]'),
+        preview: [document.getElementById('hostnameColorPreview')]
+    },
+    {
+        key: 'promptSymbol',
+        check: document.getElementById('promptSymbolColorCheck'),
+        picker: document.getElementById('promptSymbolColorPicker'),
+        value: document.getElementById('promptSymbolColorValue'),
+        card: document.querySelector('[data-control="promptSymbol"]'),
+        preview: [document.getElementById('promptSymbolPreview')]
+    }
+];
 
+const initialState = {
+    bracket: { checked: true, value: '#38bdf8' },
+    timestamp: { checked: true, value: '#fde047' },
+    directory: { checked: true, value: '#a855f7' },
+    username: { checked: true, value: '#22d3ee' },
+    hostname: { checked: true, value: '#f97316' },
+    promptSymbol: { checked: true, value: '#f43f5e' }
+};
+
+let copyTimeoutId;
+
+function hexToRgbArray(hex) {
+    const value = hex.replace('#', '');
+    return [
+        parseInt(value.slice(0, 2), 16),
+        parseInt(value.slice(2, 4), 16),
+        parseInt(value.slice(4, 6), 16)
+    ];
+}
+
+function colorizeSegment(segment, hex) {
+    if (!hex) {
+        return segment;
+    }
+
+    const rgb = hexToRgbArray(hex);
+    return `\\[\\e[38;2;${rgb.join(';')}m\\]${segment}\\[\\e[0m\\]`;
+}
+
+function updateInterface() {
+    const colorState = {};
+
+    controls.forEach(control => {
+        const isActive = control.check.checked;
+        const hex = control.picker.value;
+
+        control.picker.disabled = !isActive;
+        control.card.classList.toggle('disabled', !isActive);
+        control.value.textContent = hex.toUpperCase();
+
+        const targets = Array.isArray(control.preview) ? control.preview : [control.preview];
+        targets.forEach(target => {
+            if (!target) return;
+            target.style.color = isActive ? hex : target.dataset.defaultColor || '';
+        });
+
+        colorState[control.key] = isActive ? hex : null;
+    });
+
+    updateBashCommand(colorState);
+}
+
+function updateBashCommand(colors) {
     let command = 'export PS1="';
-    if (components.bgColor) command += `\\[\\e[48;2;${components.bgColor.join(';')}m\\]`;
-    if (components.textColor) command += `\\[\\e[38;2;${components.textColor.join(';')}m\\]`;
-    if (components.bracketColor) command += `\\[\\e[38;2;${components.bracketColor.join(';')}m\\][`;
-    if (components.timestampColor) command += `\\[\\e[38;2;${components.timestampColor.join(';')}m\\]\\t`;
-    if (components.directoryColor) command += `\\[\\e[38;2;${components.directoryColor.join(';')}m\\]\\w`;
-    if (components.bracketColor) command += `\\[\\e[38;2;${components.bracketColor.join(';')}m\\]]`;
-    command += '\\r\\n';
-    if (components.usernameColor) command += `\\[\\e[38;2;${components.usernameColor.join(';')}m\\]\\u`;
-    if (components.hostnameColor) command += `\\[\\e[38;2;${components.hostnameColor.join(';')}m\\]@\\h`;
-    if (components.promptSymbolColor) command += `\\[\\e[38;2;${components.promptSymbolColor.join(';')}m\\]$`;
-    command += '\\[$(tput sgr0)\\]"';
+
+    command += colorizeSegment('[', colors.bracket);
+    command += colorizeSegment('\\t', colors.timestamp);
+    command += colorizeSegment(']', colors.bracket);
+    command += ' ';
+    command += colorizeSegment('\\w', colors.directory);
+    command += '\\n';
+    command += colorizeSegment('\\u', colors.username);
+    command += '@';
+    command += colorizeSegment('\\h', colors.hostname);
+    command += ' ';
+    command += colorizeSegment('$', colors.promptSymbol);
+    command += ' ';
+    command += '\\[\\e[0m\\]"';
 
     bashCommand.value = command;
+}
 
-    // Update the live preview display with each color component
-    if (components.timestampColor) timestampColorPreview.style.color = `rgb(${components.timestampColor.join(',')})`;
-    if (components.directoryColor) directoryColorPreview.style.color = `rgb(${components.directoryColor.join(',')})`;
-    if (components.usernameColor) usernameColorPreview.style.color = `rgb(${components.usernameColor.join(',')})`;
-    if (components.hostnameColor) hostnameColorPreview.style.color = `rgb(${components.hostnameColor.join(',')})`;
-    if (components.promptSymbolColor) promptSymbolPreview.style.color = `rgb(${components.promptSymbolColor.join(',')})`;
-    if (components.bracketColor) {
-        bracketColorPreview.style.color = `rgb(${components.bracketColor.join(',')})`;
-        bracketColorPreviewEnd.style.color = `rgb(${components.bracketColor.join(',')})`;
+async function copyCommand() {
+    const text = bashCommand.value;
+
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            bashCommand.focus();
+            bashCommand.select();
+            document.execCommand('copy');
+            window.getSelection()?.removeAllRanges();
+        }
+        showCopyHint('Command copied to clipboard.');
+    } catch (error) {
+        console.error('Clipboard copy failed', error);
+        showCopyHint('Unable to copy. Select the text manually.', true);
     }
 }
 
-// Copy to clipboard function
-function copyToClipboard() {
-    bashCommand.select();
-    document.execCommand('copy');
-    alert('Bash command copied to clipboard!');
+function showCopyHint(message, isError = false) {
+    copyHint.textContent = message;
+    copyHint.classList.toggle('copy-hint--error', Boolean(isError));
+
+    clearTimeout(copyTimeoutId);
+    copyTimeoutId = setTimeout(() => {
+        copyHint.textContent = '';
+        copyHint.classList.remove('copy-hint--error');
+    }, 2400);
 }
 
-// Event listeners for each color picker and checkbox
-const colorPickers = [
-    { picker: bgColorPicker, display: bgColorDisplay, check: bgColorCheck },
-    { picker: textColorPicker, display: textColorDisplay, check: textColorCheck },
-    { picker: cursorColorPicker, display: cursorColorDisplay, check: cursorColorCheck },
-    { picker: bracketColorPicker, display: bracketColorDisplay, check: bracketColorCheck },
-    { picker: timestampColorPicker, display: timestampColorDisplay, check: timestampColorCheck },
-    { picker: directoryColorPicker, display: directoryColorDisplay, check: directoryColorCheck },
-    { picker: usernameColorPicker, display: usernameColorDisplay, check: usernameColorCheck },
-    { picker: hostnameColorPicker, display: hostnameColorDisplay, check: hostnameColorCheck },
-    { picker: promptSymbolColorPicker, display: promptSymbolColorDisplay, check: promptSymbolColorCheck },
-];
+function resetControls() {
+    Object.entries(initialState).forEach(([key, state]) => {
+        const control = controls.find(item => item.key === key);
+        if (!control) return;
 
-colorPickers.forEach(({ picker, display, check }) => {
-    picker.addEventListener('input', () => {
-        updateDisplay(picker, display);
-        updateBashCommand();
+        control.check.checked = state.checked;
+        control.picker.value = state.value;
     });
-    check.addEventListener('change', updateBashCommand);
+
+    updateInterface();
+    showCopyHint('Defaults restored.');
+}
+
+controls.forEach(control => {
+    control.picker.addEventListener('input', updateInterface);
+    control.check.addEventListener('change', updateInterface);
 });
 
-copyButton.addEventListener('click', copyToClipboard);
-updateBashCommand();
+copyButton.addEventListener('click', copyCommand);
+resetButton.addEventListener('click', resetControls);
+
+updateInterface();
