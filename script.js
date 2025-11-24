@@ -180,7 +180,7 @@ function buildPowerShellCommand(colors) {
         '@',
         colorizePowerShellSegment('$env:COMPUTERNAME', colors.hostname),
         ' ',
-        colorizePowerShellSegment('$', colors.promptSymbol),
+        colorizePowerShellSegment('>', colors.promptSymbol),
         ' ',
         '$([char]27)[0m'
     ].join('');
