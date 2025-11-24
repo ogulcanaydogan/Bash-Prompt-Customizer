@@ -1,7 +1,8 @@
-const bashCommand = document.getElementById('bashCommand');
+const shellCommand = document.getElementById('shellCommand');
 const copyButton = document.getElementById('copyButton');
 const copyHint = document.getElementById('copyHint');
 const resetButton = document.getElementById('resetButton');
+const shellSelector = document.getElementById('shellSelector');
 
 const controls = [
     {
@@ -86,6 +87,23 @@ function colorizeSegment(segment, hex) {
     return `\\[\\e[38;2;${rgb.join(';')}m\\]${segment}\\[\\e[0m\\]`;
 }
 
+function colorizeZshSegment(segment, hex) {
+    if (!hex) {
+        return segment;
+    }
+
+    return `%F{${hex}}${segment}%f`;
+}
+
+function colorizePowerShellSegment(segment, hex) {
+    if (!hex) {
+        return segment;
+    }
+
+    const rgb = hexToRgbArray(hex);
+    return `$([char]27)[38;2;${rgb.join(';')}m${segment}$([char]27)[0m`;
+}
+
 function updateInterface() {
     const colorState = {};
 
@@ -106,10 +124,10 @@ function updateInterface() {
         colorState[control.key] = isActive ? hex : null;
     });
 
-    updateBashCommand(colorState);
+    updateShellCommand(colorState);
 }
 
-function updateBashCommand(colors) {
+function buildBashCommand(colors) {
     let command = 'export PS1="';
 
     command += colorizeSegment('[', colors.bracket);
@@ -126,18 +144,82 @@ function updateBashCommand(colors) {
     command += ' ';
     command += '\\[\\e[0m\\]"';
 
-    bashCommand.value = command;
+    return command;
+}
+
+function buildZshCommand(colors) {
+    let command = "export PROMPT=$'";
+
+    command += colorizeZshSegment('[', colors.bracket);
+    command += colorizeZshSegment('%*', colors.timestamp);
+    command += colorizeZshSegment(']', colors.bracket);
+    command += ' ';
+    command += colorizeZshSegment('%~', colors.directory);
+    command += '\\n';
+    command += colorizeZshSegment('%n', colors.username);
+    command += '@';
+    command += colorizeZshSegment('%m', colors.hostname);
+    command += ' ';
+    command += colorizeZshSegment('$', colors.promptSymbol);
+    command += ' ';
+    command += '%f%k';
+    command += "'";
+
+    return command;
+}
+
+function buildPowerShellCommand(colors) {
+    const parts = [
+        colorizePowerShellSegment('[', colors.bracket),
+        colorizePowerShellSegment('$([DateTime]::Now.ToString(\"HH:mm:ss\"))', colors.timestamp),
+        colorizePowerShellSegment(']', colors.bracket),
+        ' ',
+        colorizePowerShellSegment('$(Get-Location)', colors.directory),
+        '`n',
+        colorizePowerShellSegment('$env:USERNAME', colors.username),
+        '@',
+        colorizePowerShellSegment('$env:COMPUTERNAME', colors.hostname),
+        ' ',
+        colorizePowerShellSegment('$', colors.promptSymbol),
+        ' ',
+        '$([char]27)[0m'
+    ].join('');
+
+    return [
+        'function prompt {',
+        `    "${parts}"`,
+        '}'
+    ].join('\n');
+}
+
+function updateShellCommand(colors) {
+    let command;
+
+    switch (shellSelector.value) {
+        case 'zsh':
+            command = buildZshCommand(colors);
+            break;
+        case 'powershell':
+            command = buildPowerShellCommand(colors);
+            break;
+        case 'bash':
+        default:
+            command = buildBashCommand(colors);
+            break;
+    }
+
+    shellCommand.value = command;
 }
 
 async function copyCommand() {
-    const text = bashCommand.value;
+    const text = shellCommand.value;
 
     try {
         if (navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
         } else {
-            bashCommand.focus();
-            bashCommand.select();
+            shellCommand.focus();
+            shellCommand.select();
             document.execCommand('copy');
             window.getSelection()?.removeAllRanges();
         }
@@ -179,5 +261,6 @@ controls.forEach(control => {
 
 copyButton.addEventListener('click', copyCommand);
 resetButton.addEventListener('click', resetControls);
+shellSelector.addEventListener('change', updateInterface);
 
 updateInterface();
