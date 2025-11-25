@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bash Prompt Customizer</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .container {
+            background: #2e2e2e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-section {
+            margin: 20px 0;
+        }
+
+        .bash-command {
+            width: 100%;
+            height: 100px;
+            margin-top: 20px;
+            font-size: 16px;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bash Prompt Customizer</h1>
+
+        <div class="color-section">
+            <label>Background Color:</label>
+            <input type="color" id="bgColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('bgColorPicker')">Reset</button>
+        </div>
+        <div class="color-section">
+            <label>Text Color:</label>
+            <input type="color" id="textColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('textColorPicker')">Reset</button>
+        </div>
+        <div class="color-section">
+            <label>Cursor Color:</label>
+            <input type="color" id="cursorColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('cursorColorPicker')">Reset</button>
+        </div>
+        <div class="color-section">
+            <label>Bracket Color:</label>
+            <input type="color" id="bracketColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('bracketColorPicker')">Reset</button>
+        </div>
+        <div class="color-section">
+            <label>Timestamp Color:</label>
+            <input type="color" id="timestampColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('timestampColorPicker')">Reset</button>
+        </div>
+        <div class="color-section">
+            <label>Directory Color:</label>
+            <input type="color" id="directoryColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('directoryColorPicker')">Reset</button>
+        </div>
+        <div class="color-section">
+            <label>Username Color:</label>
+            <input type="color" id="usernameColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('usernameColorPicker')">Reset</button>
+        </div>
+        <div class="color-section">
+            <label>Hostname Color:</label>
+            <input type="color" id="hostnameColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('hostnameColorPicker')">Reset</button>
+        </div>
+        <div class="color-section">
+            <label>Prompt Symbol Color:</label>
+            <input type="color" id="promptSymbolColorPicker" value="#ffffff" onchange="updateBashCommand()">
+            <button onclick="resetColor('promptSymbolColorPicker')">Reset</button>
+        </div>
+
+        <button id="resetAllButton" onclick="resetAll()">Reset All</button>
+
+        <div id="previewContainer" style="background-color: #1e1e1e; padding: 20px; margin-top: 10px;">
+            <!-- Live preview -->
+            <pre id="previewPrompt" style="font-family: monospace; font-size: 1.2em; white-space: pre-wrap;">
+                <span id="bracketColorPreview">[</span>
+                <span id="timestampColorPreview">16:00:32</span>
+                <span id="bracketColorPreviewEnd">]</span>
+                <span id="directoryColorPreview"> ~</span>
+                <br>
+                <span id="usernameColorPreview">user</span>
+                <span id="atSymbol">@</span>
+                <span id="hostnameColorPreview">host</span>
+                <span id="promptSymbolPreview"> $</span>
+            </pre>
+        </div>
+
+        <textarea id="bashCommand" class="bash-command" readonly></textarea>
+        <button id="copyButton" onclick="copyToClipboard()">Copy Bash Command</button>
+
+        <footer style="text-align: center; margin-top: 20px;">
+            <p>Created by <a href="https://ogulcanaydogan.com" target="_blank">Ogulcan Aydoğan</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Function to update the live preview and bash command
+        function updateBashCommand() {
+            const bgColor = document.getElementById('bgColorPicker').value;
+            const textColor = document.getElementById('textColorPicker').value;
+            const cursorColor = document.getElementById('cursorColorPicker').value;
+            const bracketColor = document.getElementById('bracketColorPicker').value;
+            const timestampColor = document.getElementById('timestampColorPicker').value;
+            const directoryColor = document.getElementById('directoryColorPicker').value;
+            const usernameColor = document.getElementById('usernameColorPicker').value;
+            const hostnameColor = document.getElementById('hostnameColorPicker').value;
+            const promptSymbolColor = document.getElementById('promptSymbolColorPicker').value;
+
+            const preview = document.getElementById('previewPrompt');
+
+            // Update colors in the preview
+            preview.style.backgroundColor = bgColor;
+            preview.style.color = textColor;
+
+            document.getElementById('bracketColorPreview').style.color = bracketColor;
+            document.getElementById('timestampColorPreview').style.color = timestampColor;
+            document.getElementById('directoryColorPreview').style.color = directoryColor;
+            document.getElementById('usernameColorPreview').style.color = usernameColor;
+            document.getElementById('hostnameColorPreview').style.color = hostnameColor;
+            document.getElementById('promptSymbolPreview').style.color = promptSymbolColor;
+
+            // Update bash command text
+            const bashCommand = `export PS1="\\[\\e[48;2;${hexToRgb(bgColor).join(';')}m\\]\\[\\e[38;2;${hexToRgb(textColor).join(';')}m\\]\\u@\\h \\[\\e[38;2;${hexToRgb(directoryColor).join(';')}m\\]\\w \\[\\e[38;2;${hexToRgb(bracketColor).join(';')}m\\][\\t]\\[\\e[38;2;${hexToRgb(bracketColor).join(';')}m\\]] \\[\\e[38;2;${hexToRgb(promptSymbolColor).join(';')}m\\]$\\[$(tput sgr0)\\]"`;
+            document.getElementById('bashCommand').value = bashCommand;
+        }
+
+        // Convert hex color to RGB
+        function hexToRgb(hex) {
+            const bigint = parseInt(hex.slice(1), 16);
+            return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+        }
+
+        // Function to reset a specific color picker
+        function resetColor(colorPickerId) {
+            document.getElementById(colorPickerId).value = '#ffffff'; // Set to default white color
+            updateBashCommand(); // Update bash command
+        }
+
+        // Function to reset all color pickers
+        function resetAll() {
+            const colorPickers = [
+                'bgColorPicker',
+                'textColorPicker',
+                'cursorColorPicker',
+                'bracketColorPicker',
+                'timestampColorPicker',
+                'directoryColorPicker',
+                'usernameColorPicker',
+                'hostnameColorPicker',
+                'promptSymbolColorPicker',
+            ];
+            colorPickers.forEach(colorPickerId => {
+                document.getElementById(colorPickerId).value = '#ffffff'; // Set to default color
+            });
+            updateBashCommand(); // Update bash command
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard() {
+            const bashCommand = document.getElementById('bashCommand');
+            bashCommand.select();
+            document.execCommand('copy');
+            alert('Bash command copied to clipboard!');
+        }
+
+        // Initial update to set default values
