@@ -55,7 +55,6 @@ pipeline {
 
                   aws s3 sync dist "s3://$S3_BUCKET" \
                     --delete \
-                    --acl public-read \
                     --cache-control "max-age=300"
                 '''
             }
