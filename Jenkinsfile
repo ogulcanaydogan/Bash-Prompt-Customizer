@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        pollSCM('H/5 * * * *')  // Check every 5 minutes
+    }
+
     environment {
         AWS_DEFAULT_REGION = 'us-east-1'
         S3_BUCKET          = 'bash.ogulcanaydogan.com'
