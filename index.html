@@ -10,7 +10,7 @@
     <header class="app-header">
         <div class="app-header__content">
             <h1>Bash Prompt Customizer</h1>
-            <p>Design a two-line <code>PS1</code> prompt with vivid colors, live preview, and a ready-to-copy export command.</p>
+            <p>Design a two-line prompt with vivid colors, live preview, and a ready-to-copy export command for Bash, Zsh, or PowerShell.</p>
         </div>
     </header>
 
@@ -148,10 +148,20 @@
 
             <div class="command-panel">
                 <div class="command-panel__header">
-                    <h3>Export command</h3>
-                    <p>Add this to your <code>.bashrc</code> or run it in your terminal.</p>
+                    <div>
+                        <h3>Export command</h3>
+                        <p>Copy the prompt snippet for your shell and paste it into your profile.</p>
+                    </div>
+                    <label class="select-label" for="shellSelector">
+                        <span class="select-label__text">Shell</span>
+                        <select id="shellSelector" class="shell-select">
+                            <option value="bash">Bash</option>
+                            <option value="zsh">Zsh</option>
+                            <option value="powershell">PowerShell</option>
+                        </select>
+                    </label>
                 </div>
-                <textarea id="bashCommand" class="bash-command" rows="4" readonly spellcheck="false"></textarea>
+                <textarea id="shellCommand" class="bash-command" rows="4" readonly spellcheck="false"></textarea>
                 <div class="action-row">
                     <button id="copyButton" class="primary-button" type="button">Copy command</button>
                     <span id="copyHint" class="copy-hint" role="status" aria-live="polite"></span>
