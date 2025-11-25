@@ -1,179 +1,288 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bash Prompt Customizer</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <header class="app-header">
-        <div class="app-header__content">
-            <h1>Bash Prompt Customizer</h1>
-            <p>Design a two-line prompt with vivid colors, live preview, and a ready-to-copy export command for Bash, Zsh, or PowerShell.</p>
-        </div>
+      <div class="app-header__content">
+        <h1>Bash Prompt Customizer</h1>
+        <p>
+          Design a two-line prompt with vivid colors, live preview, and a
+          ready-to-copy export command for Bash, Zsh, or PowerShell.
+        </p>
+      </div>
     </header>
 
     <main class="app-shell">
-        <section class="builder-panel" aria-labelledby="controlsTitle">
-            <div class="panel-heading">
-                <div>
-                    <h2 id="controlsTitle">Prompt segments</h2>
-                    <p class="panel-description">Toggle the pieces you want to colorize, then pick a tone that matches your style.</p>
-                </div>
-                <button id="resetButton" class="ghost-button" type="button">Reset to defaults</button>
+      <section class="builder-panel" aria-labelledby="controlsTitle">
+        <div class="panel-heading">
+          <div>
+            <h2 id="controlsTitle">Prompt segments</h2>
+            <p class="panel-description">
+              Toggle the pieces you want to colorize, then pick a tone that
+              matches your style.
+            </p>
+          </div>
+          <button id="resetButton" class="ghost-button" type="button">
+            Reset to defaults
+          </button>
+        </div>
+
+        <div class="control-grid">
+          <article class="control-card" data-control="bracket">
+            <header class="control-card__header">
+              <div>
+                <h3>Brackets</h3>
+                <p>
+                  Colors the <code>[</code> and <code>]</code> around the
+                  timestamp.
+                </p>
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="bracketColorCheck"
+                  data-control-key="bracket"
+                  checked
+                />
+                <span class="switch__track" aria-hidden="true"></span>
+                <span class="visually-hidden">Enable bracket color</span>
+              </label>
+            </header>
+            <div class="control-card__body">
+              <input
+                type="color"
+                id="bracketColorPicker"
+                value="#38bdf8"
+                aria-describedby="bracketColorValue"
+              />
+              <span id="bracketColorValue" class="color-value">#38BDF8</span>
             </div>
+          </article>
 
-            <div class="control-grid">
-                <article class="control-card" data-control="bracket">
-                    <header class="control-card__header">
-                        <div>
-                            <h3>Brackets</h3>
-                            <p>Colors the <code>[</code> and <code>]</code> around the timestamp.</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="bracketColorCheck" data-control-key="bracket" checked>
-                            <span class="switch__track" aria-hidden="true"></span>
-                            <span class="visually-hidden">Enable bracket color</span>
-                        </label>
-                    </header>
-                    <div class="control-card__body">
-                        <input type="color" id="bracketColorPicker" value="#38bdf8" aria-describedby="bracketColorValue">
-                        <span id="bracketColorValue" class="color-value">#38BDF8</span>
-                    </div>
-                </article>
-
-                <article class="control-card" data-control="timestamp">
-                    <header class="control-card__header">
-                        <div>
-                            <h3>Timestamp</h3>
-                            <p>Styles the <code>\t</code> time component on the first line.</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="timestampColorCheck" data-control-key="timestamp" checked>
-                            <span class="switch__track" aria-hidden="true"></span>
-                            <span class="visually-hidden">Enable timestamp color</span>
-                        </label>
-                    </header>
-                    <div class="control-card__body">
-                        <input type="color" id="timestampColorPicker" value="#fde047" aria-describedby="timestampColorValue">
-                        <span id="timestampColorValue" class="color-value">#FDE047</span>
-                    </div>
-                </article>
-
-                <article class="control-card" data-control="directory">
-                    <header class="control-card__header">
-                        <div>
-                            <h3>Working directory</h3>
-                            <p>Highlights the <code>\w</code> path displayed after the timestamp.</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="directoryColorCheck" data-control-key="directory" checked>
-                            <span class="switch__track" aria-hidden="true"></span>
-                            <span class="visually-hidden">Enable directory color</span>
-                        </label>
-                    </header>
-                    <div class="control-card__body">
-                        <input type="color" id="directoryColorPicker" value="#a855f7" aria-describedby="directoryColorValue">
-                        <span id="directoryColorValue" class="color-value">#A855F7</span>
-                    </div>
-                </article>
-
-                <article class="control-card" data-control="username">
-                    <header class="control-card__header">
-                        <div>
-                            <h3>Username</h3>
-                            <p>Applies color to the <code>\u</code> username on the second line.</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="usernameColorCheck" data-control-key="username" checked>
-                            <span class="switch__track" aria-hidden="true"></span>
-                            <span class="visually-hidden">Enable username color</span>
-                        </label>
-                    </header>
-                    <div class="control-card__body">
-                        <input type="color" id="usernameColorPicker" value="#22d3ee" aria-describedby="usernameColorValue">
-                        <span id="usernameColorValue" class="color-value">#22D3EE</span>
-                    </div>
-                </article>
-
-                <article class="control-card" data-control="hostname">
-                    <header class="control-card__header">
-                        <div>
-                            <h3>Hostname</h3>
-                            <p>Colors the <code>\h</code> host that follows the <code>@</code> symbol.</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="hostnameColorCheck" data-control-key="hostname" checked>
-                            <span class="switch__track" aria-hidden="true"></span>
-                            <span class="visually-hidden">Enable hostname color</span>
-                        </label>
-                    </header>
-                    <div class="control-card__body">
-                        <input type="color" id="hostnameColorPicker" value="#f97316" aria-describedby="hostnameColorValue">
-                        <span id="hostnameColorValue" class="color-value">#F97316</span>
-                    </div>
-                </article>
-
-                <article class="control-card" data-control="promptSymbol">
-                    <header class="control-card__header">
-                        <div>
-                            <h3>Prompt symbol</h3>
-                            <p>Styles the trailing <code>$</code> to match your shell vibe.</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="promptSymbolColorCheck" data-control-key="promptSymbol" checked>
-                            <span class="switch__track" aria-hidden="true"></span>
-                            <span class="visually-hidden">Enable prompt symbol color</span>
-                        </label>
-                    </header>
-                    <div class="control-card__body">
-                        <input type="color" id="promptSymbolColorPicker" value="#f43f5e" aria-describedby="promptSymbolColorValue">
-                        <span id="promptSymbolColorValue" class="color-value">#F43F5E</span>
-                    </div>
-                </article>
+          <article class="control-card" data-control="timestamp">
+            <header class="control-card__header">
+              <div>
+                <h3>Timestamp</h3>
+                <p>
+                  Styles the <code>\t</code> time component on the first line.
+                </p>
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="timestampColorCheck"
+                  data-control-key="timestamp"
+                  checked
+                />
+                <span class="switch__track" aria-hidden="true"></span>
+                <span class="visually-hidden">Enable timestamp color</span>
+              </label>
+            </header>
+            <div class="control-card__body">
+              <input
+                type="color"
+                id="timestampColorPicker"
+                value="#fde047"
+                aria-describedby="timestampColorValue"
+              />
+              <span id="timestampColorValue" class="color-value">#FDE047</span>
             </div>
-        </section>
+          </article>
 
-        <section class="preview-panel" aria-labelledby="previewTitle">
-            <h2 id="previewTitle">Live preview</h2>
-            <p class="panel-description">See how your prompt renders in a terminal-inspired preview.</p>
+          <article class="control-card" data-control="directory">
+            <header class="control-card__header">
+              <div>
+                <h3>Working directory</h3>
+                <p>
+                  Highlights the <code>\w</code> path displayed after the
+                  timestamp.
+                </p>
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="directoryColorCheck"
+                  data-control-key="directory"
+                  checked
+                />
+                <span class="switch__track" aria-hidden="true"></span>
+                <span class="visually-hidden">Enable directory color</span>
+              </label>
+            </header>
+            <div class="control-card__body">
+              <input
+                type="color"
+                id="directoryColorPicker"
+                value="#a855f7"
+                aria-describedby="directoryColorValue"
+              />
+              <span id="directoryColorValue" class="color-value">#A855F7</span>
+            </div>
+          </article>
 
-            <div id="previewContainer" class="preview-terminal" aria-live="polite">
-                <pre id="previewPrompt">
+          <article class="control-card" data-control="username">
+            <header class="control-card__header">
+              <div>
+                <h3>Username</h3>
+                <p>
+                  Applies color to the <code>\u</code> username on the second
+                  line.
+                </p>
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="usernameColorCheck"
+                  data-control-key="username"
+                  checked
+                />
+                <span class="switch__track" aria-hidden="true"></span>
+                <span class="visually-hidden">Enable username color</span>
+              </label>
+            </header>
+            <div class="control-card__body">
+              <input
+                type="color"
+                id="usernameColorPicker"
+                value="#22d3ee"
+                aria-describedby="usernameColorValue"
+              />
+              <span id="usernameColorValue" class="color-value">#22D3EE</span>
+            </div>
+          </article>
+
+          <article class="control-card" data-control="hostname">
+            <header class="control-card__header">
+              <div>
+                <h3>Hostname</h3>
+                <p>
+                  Colors the <code>\h</code> host that follows the
+                  <code>@</code> symbol.
+                </p>
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="hostnameColorCheck"
+                  data-control-key="hostname"
+                  checked
+                />
+                <span class="switch__track" aria-hidden="true"></span>
+                <span class="visually-hidden">Enable hostname color</span>
+              </label>
+            </header>
+            <div class="control-card__body">
+              <input
+                type="color"
+                id="hostnameColorPicker"
+                value="#f97316"
+                aria-describedby="hostnameColorValue"
+              />
+              <span id="hostnameColorValue" class="color-value">#F97316</span>
+            </div>
+          </article>
+
+          <article class="control-card" data-control="promptSymbol">
+            <header class="control-card__header">
+              <div>
+                <h3>Prompt symbol</h3>
+                <p>
+                  Styles the trailing <code>$</code> to match your shell vibe.
+                </p>
+              </div>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="promptSymbolColorCheck"
+                  data-control-key="promptSymbol"
+                  checked
+                />
+                <span class="switch__track" aria-hidden="true"></span>
+                <span class="visually-hidden">Enable prompt symbol color</span>
+              </label>
+            </header>
+            <div class="control-card__body">
+              <input
+                type="color"
+                id="promptSymbolColorPicker"
+                value="#f43f5e"
+                aria-describedby="promptSymbolColorValue"
+              />
+              <span id="promptSymbolColorValue" class="color-value"
+                >#F43F5E</span
+              >
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="preview-panel" aria-labelledby="previewTitle">
+        <h2 id="previewTitle">Live preview</h2>
+        <p class="panel-description">
+          See how your prompt renders in a terminal-inspired preview.
+        </p>
+
+        <div id="previewContainer" class="preview-terminal" aria-live="polite">
+          <pre id="previewPrompt">
 <span id="bracketColorPreview" data-default-color="#6b7280" style="color:#6b7280;">[</span><span id="timestampColorPreview" data-default-color="#facc15" style="color:#facc15;">16:42:03</span><span id="bracketColorPreviewEnd" data-default-color="#6b7280" style="color:#6b7280;">]</span><span class="preview-space"> </span><span id="directoryColorPreview" data-default-color="#a5b4fc" style="color:#a5b4fc;">~/workspace/bash-customizer</span>
 <span id="usernameColorPreview" data-default-color="#22d3ee" style="color:#22d3ee;">user</span><span id="atSymbol" data-default-color="#94a3b8" style="color:#94a3b8;">@</span><span id="hostnameColorPreview" data-default-color="#f97316" style="color:#f97316;">host</span><span class="preview-space"> </span><span id="promptSymbolPreview" data-default-color="#f43f5e" style="color:#f43f5e;">$</span><span class="preview-cursor" aria-hidden="true">▊</span>
                 </pre>
-            </div>
+        </div>
 
-            <div class="command-panel">
-                <div class="command-panel__header">
-                    <div>
-                        <h3>Export command</h3>
-                        <p>Copy the prompt snippet for your shell and paste it into your profile.</p>
-                    </div>
-                    <label class="select-label" for="shellSelector">
-                        <span class="select-label__text">Shell</span>
-                        <select id="shellSelector" class="shell-select">
-                            <option value="bash">Bash</option>
-                            <option value="zsh">Zsh</option>
-                            <option value="powershell">PowerShell</option>
-                        </select>
-                    </label>
-                </div>
-                <textarea id="shellCommand" class="bash-command" rows="4" readonly spellcheck="false"></textarea>
-                <div class="action-row">
-                    <button id="copyButton" class="primary-button" type="button">Copy command</button>
-                    <span id="copyHint" class="copy-hint" role="status" aria-live="polite"></span>
-                </div>
+        <div class="command-panel">
+          <div class="command-panel__header">
+            <div>
+              <h3>Export command</h3>
+              <p>
+                Copy the prompt snippet for your shell and paste it into your
+                profile.
+              </p>
             </div>
-        </section>
+            <label class="select-label" for="shellSelector">
+              <span class="select-label__text">Shell</span>
+              <select id="shellSelector" class="shell-select">
+                <option value="bash">Bash</option>
+                <option value="zsh">Zsh</option>
+                <option value="powershell">PowerShell</option>
+              </select>
+            </label>
+          </div>
+          <textarea
+            id="shellCommand"
+            class="bash-command"
+            rows="4"
+            readonly
+            spellcheck="false"
+          ></textarea>
+          <div class="action-row">
+            <button id="copyButton" class="primary-button" type="button">
+              Copy command
+            </button>
+            <span
+              id="copyHint"
+              class="copy-hint"
+              role="status"
+              aria-live="polite"
+            ></span>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer class="app-footer">
-        <p>Created by <a href="https://www.ogulcanaydogan.com" target="_blank" rel="noopener">Oğulcan Aydoğan</a></p>
+      <p>
+        Created by
+        <a href="https://www.ogulcanaydogan.com" target="_blank" rel="noopener"
+          >Oğulcan Aydoğan</a
+        >
+      </p>
     </footer>
 
     <script src="script.js" defer></script>
-</body>
+  </body>
 </html>
