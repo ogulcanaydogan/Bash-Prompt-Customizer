@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        docker { image 'node:18-bullseye' }
-    }
+    agent any
 
     options {
         timeout(time: 10, unit: 'MINUTES')
