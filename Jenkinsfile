@@ -39,14 +39,4 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            script {
-                if (fileExists('**/junit-*.xml')) {
-                    junit allowEmptyResults: true, testResults: '**/junit-*.xml'
-                }
-            }
-        }
-    }
 }
