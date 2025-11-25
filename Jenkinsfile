@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+        S3_BUCKET          = 'bash.ogulcanaydogan.com'
+        CLOUDFRONT_DIST_ID = 'E2AB9D5D7EWDT5'
+    }
+
     options {
         timeout(time: 10, unit: 'MINUTES')
     }
@@ -35,6 +41,41 @@ pipeline {
                 sh "mkdir -p dist && cp index.html styles.css script.js dist/"
                 archiveArtifacts artifacts: 'dist/**', fingerprint: true
             }
+        }
+
+        stage('Deploy to S3') {
+            steps {
+                sh '''
+                  echo "Deploying dist/ to s3://$S3_BUCKET"
+
+                  if [ ! -d "dist" ]; then
+                    echo "dist/ folder missing, aborting."
+                    exit 1
+                  fi
+
+                  aws s3 sync dist "s3://$S3_BUCKET" \
+                    --delete \
+                    --acl public-read \
+                    --cache-control "max-age=300"
+                '''
+            }
+        }
+
+        stage('Invalidate CloudFront') {
+            steps {
+                sh '''
+                  echo "Invalidating CloudFront distribution $CLOUDFRONT_DIST_ID"
+                  aws cloudfront create-invalidation \
+                    --distribution-id "$CLOUDFRONT_DIST_ID" \
+                    --paths "/*"
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
         }
     }
 }
